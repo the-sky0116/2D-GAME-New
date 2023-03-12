@@ -10,22 +10,18 @@ public class PlayerControl : MonoBehaviour
     public float MoveSpeed;
     public float direction;
     public float JumpForce;
-    public float WallSlidingSpeed;
-    public float MoveForceAir;
+
+
     Rigidbody2D rb;
     public Transform Groundcheck;
-    public Transform WallCheck;
     public LayerMask WhatIsGround;
     public float GroundRadius;
-    public float wallCheckDistance;
     public int amountJump = 1;
-    private int amountJumpLeft;
+    public int amountJumpLeft;
     bool isWalking;
     bool isGrounded;
-    bool isTouchwall;
     bool isFacinghtRight;
     bool canJump;
-    bool isWallSliding;
     Animator anim;
     void Start()
     {
@@ -35,19 +31,17 @@ public class PlayerControl : MonoBehaviour
 
     void FixedUpdate()
     {
-        
+        DirectionCheck();
+        Move();
+        CheckSurrounding();
+        AnimationCheck();
     }
 
     void Update()
     {
-        CheckJump();
-        CheckSliding();
-        Jump();
-        Move();
-        DirectionCheck();
-        CheckSurrounding();
-        AnimationCheck();
-        
+        ApplyJump();
+        CheckIfCanJump();
+
     }
     private void Move()
     {
@@ -55,23 +49,6 @@ public class PlayerControl : MonoBehaviour
         if(isGrounded)
         {
             rb.velocity = new Vector2(MoveSpeed * direction, rb.velocity.y);
-        }
-        else if(!isGrounded&&!isWallSliding&&direction!=0)
-        {
-            Vector2 forcetoAdd = new Vector2(MoveForceAir * direction, 0);
-            rb.AddForce(forcetoAdd);
-
-            if(Mathf.Abs(rb.velocity.x)>MoveSpeed)
-            {
-                rb.velocity=new Vector2 (MoveSpeed*direction, rb.velocity.y);
-            }
-        }
-        if(isWallSliding)
-        {
-            if(rb.velocity.y<-WallSlidingSpeed)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, -WallSlidingSpeed);
-            }
         }
         
         
@@ -81,7 +58,6 @@ public class PlayerControl : MonoBehaviour
         anim.SetBool("Walking",isWalking);
         anim.SetBool("isGrounded", isGrounded);
         anim.SetFloat("yVelocity", rb.velocity.y);
-        anim.SetBool("isSliding", isWallSliding);
     }
     
     private void DirectionCheck()
@@ -105,61 +81,51 @@ public class PlayerControl : MonoBehaviour
     }
     private void Flip()
     {
-        if (!isWallSliding)
+        isFacinghtRight=!isFacinghtRight;
+        transform.Rotate(0.0f, 180.0f, 0.0f);
+    }
+     private void ApplyJump()
+     {
+        if (Input.GetButtonDown("Jump"))
         {
-            isFacinghtRight=!isFacinghtRight;
-            transform.Rotate(0.0f, 180.0f, 0.0f);
+            Jump();
+        }
+     }
+    private void Jump()
+    {
+        if(canJump)
+        {
+            {
+                rb.velocity = new Vector2(rb.velocity.x, JumpForce);
+                amountJumpLeft--; 
+            }
         }
     }
-       
-
-    private void CheckJump()
+    private void CheckIfCanJump()
     {
-        if(isGrounded&&rb.velocity.y<=0) 
+        if(isGrounded&&rb.velocity.y<=0)
         {
-            amountJumpLeft =  amountJump;
+            amountJumpLeft = amountJump;
         }
-        if(amountJumpLeft<=0)
+        if(amountJumpLeft<0)
         {
             canJump = false;
         }
         else
         {
-            canJump = true;
+            canJump= true;
         }
     }
-    private void CheckSliding()
-    {
-        if(isTouchwall&&!isGrounded&&rb.velocity.y<0)
-        {
-            isWallSliding = true;
-        }
-        else
-        {
-            isWallSliding = false;
-        }
-    }
-    private void Jump() 
-    {
-        if(canJump)
-        {
-            if (Input.GetButtonDown("Jump"))
-            {
-                rb.velocity = new Vector2(rb.velocity.x, JumpForce);
-                amountJumpLeft--;
-            }
-            
-        }                    
-        
-    }
+
+
+
+
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(Groundcheck.position, GroundRadius);
-        Gizmos.DrawLine(WallCheck.position, new Vector3(WallCheck.position.x+wallCheckDistance,WallCheck.position.y,WallCheck.position.z));
     }
     private void CheckSurrounding()
     {
         isGrounded = Physics2D.OverlapCircle(Groundcheck.position, GroundRadius, WhatIsGround);
-        isTouchwall = Physics2D.Raycast(WallCheck.position, transform.right, wallCheckDistance, WhatIsGround);
     }
 }
