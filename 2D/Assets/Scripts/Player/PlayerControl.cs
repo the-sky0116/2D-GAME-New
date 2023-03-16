@@ -27,31 +27,46 @@ public class PlayerControl : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        
     }
 
     void FixedUpdate()
     {
+        direction = Input.GetAxisRaw("Horizontal");
+        if (isGrounded)
+        {
+            rb.velocity = new Vector2(MoveSpeed * direction, rb.velocity.y);
+        }
+        isGrounded = Physics2D.OverlapCircle(Groundcheck.position, GroundRadius, WhatIsGround);
         DirectionCheck();
-        Move();
-        CheckSurrounding();
         AnimationCheck();
     }
 
     void Update()
     {
-        ApplyJump();
-        CheckIfCanJump();
-
-    }
-    private void Move()
-    {
-        direction = Input.GetAxisRaw("Horizontal");
-        if(isGrounded)
+        if (Input.GetButtonDown("Jump"))
         {
-            rb.velocity = new Vector2(MoveSpeed * direction, rb.velocity.y);
+            if (canJump)
+            {
+                {
+                    rb.velocity = new Vector2(rb.velocity.x, JumpForce);
+                    amountJumpLeft--;
+                }
+            }
         }
-        
-        
+        if (isGrounded && rb.velocity.y <= 0)
+        {
+            amountJumpLeft = amountJump;
+        }
+        if (amountJumpLeft < 0)
+        {
+            canJump = false;
+        }
+        else
+        {
+            canJump = true;
+        }
+
     }
     private void AnimationCheck()
     {
@@ -64,11 +79,13 @@ public class PlayerControl : MonoBehaviour
     {
         if(isFacinghtRight&&direction>0)
         {
-            Flip();
+            isFacinghtRight = !isFacinghtRight;
+            transform.Rotate(0.0f, 180.0f, 0.0f);
         }
         else if(!isFacinghtRight&&direction<0) 
         {
-            Flip();
+            isFacinghtRight = !isFacinghtRight;
+            transform.Rotate(0.0f, 180.0f, 0.0f);
         }
         if(rb.velocity.x!=0) 
         {
@@ -79,53 +96,8 @@ public class PlayerControl : MonoBehaviour
             isWalking= false;
         }
     }
-    private void Flip()
-    {
-        isFacinghtRight=!isFacinghtRight;
-        transform.Rotate(0.0f, 180.0f, 0.0f);
-    }
-     private void ApplyJump()
-     {
-        if (Input.GetButtonDown("Jump"))
-        {
-            Jump();
-        }
-     }
-    private void Jump()
-    {
-        if(canJump)
-        {
-            {
-                rb.velocity = new Vector2(rb.velocity.x, JumpForce);
-                amountJumpLeft--; 
-            }
-        }
-    }
-    private void CheckIfCanJump()
-    {
-        if(isGrounded&&rb.velocity.y<=0)
-        {
-            amountJumpLeft = amountJump;
-        }
-        if(amountJumpLeft<0)
-        {
-            canJump = false;
-        }
-        else
-        {
-            canJump= true;
-        }
-    }
-
-
-
-
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(Groundcheck.position, GroundRadius);
-    }
-    private void CheckSurrounding()
-    {
-        isGrounded = Physics2D.OverlapCircle(Groundcheck.position, GroundRadius, WhatIsGround);
     }
 }
