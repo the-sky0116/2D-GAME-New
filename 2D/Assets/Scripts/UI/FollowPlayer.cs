@@ -8,6 +8,6 @@ public class FollowPlayer : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.LookAt(transform.position+cam.forward);
+        transform.LookAt(transform.position + cam.forward);
     }
 }
