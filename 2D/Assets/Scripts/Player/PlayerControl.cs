@@ -80,12 +80,12 @@ public class PlayerControl : MonoBehaviour
         if(isFacinghtRight&&direction>0)
         {
             isFacinghtRight = !isFacinghtRight;
-            transform.Rotate(0.0f, 180.0f, 0.0f);
+            transform.localScale = new Vector3(6f, 6f, 0f);
         }
         else if(!isFacinghtRight&&direction<0) 
         {
             isFacinghtRight = !isFacinghtRight;
-            transform.Rotate(0.0f, 180.0f, 0.0f);
+            transform.localScale = new Vector3(-6f, 6f, 0f);
         }
         if(rb.velocity.x!=0) 
         {

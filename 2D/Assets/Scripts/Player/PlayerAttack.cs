@@ -26,14 +26,15 @@ public class PlayerAttack : MonoBehaviour
             collider2d.enabled = true;
             anim.SetTrigger("attack");
             StartCoroutine(StartAttack());
+            
         }
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.gameObject.CompareTag("Player")&&other.GetType().ToString()=="UnityEngine.BoxCollider2D")
+        if(other.gameObject.CompareTag("Enemy")&&other.GetType().ToString()=="UnityEngine.BoxCollider2D")
         {
             other.GetComponent<Enemy>().takeDamage(PlayerDamage);
-            Debug.Log("hit");
+            
         }
     }
     IEnumerator StartAttack()
