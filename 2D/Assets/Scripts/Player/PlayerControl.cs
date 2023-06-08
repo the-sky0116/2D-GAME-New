@@ -35,7 +35,7 @@ public class PlayerControl : MonoBehaviour
         direction = Input.GetAxisRaw("Horizontal");
         if (isGrounded)
         {
-            rb.velocity = new Vector2(MoveSpeed * direction, rb.velocity.y);
+            rb.velocity=new Vector2(MoveSpeed*direction, rb.velocity.y);
         }
         isGrounded = Physics2D.OverlapCircle(Groundcheck.position, GroundRadius, WhatIsGround);
         DirectionCheck();

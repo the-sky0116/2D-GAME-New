@@ -2,36 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyControl : MonoBehaviour
+public class EnemyControl : Enemy
 {
-    [SerializeField] float moveSpeed;
-    bool isFacingRight;
-    Rigidbody2D rb;
+    public float speed;
+    public float waitTime;
+    public Transform[] movePos;
+
+    private int i = 0;
+    private bool isFacingRight = true;
+    private float wait;
     void Start()
     {
-        rb= GetComponent<Rigidbody2D>();
+        wait = waitTime;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(IsFacingRight())
-        {
-            rb.velocity = new Vector2(moveSpeed, 0f);
-        }
-        else
-        {
-            rb.velocity=new Vector2(-moveSpeed, 0f);
-        }
+       // transform.position = Vector2.MoveTowards(transform.position, movePos[i].position, speed*Time.deltaTime);
     }
 
-    private bool IsFacingRight()
-    {
-        return transform.localScale.x > Mathf.Epsilon;
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        transform.localScale= new Vector2(4f,transform.localScale.y);
-        transform.localScale = new Vector2(-4f, transform.localScale.y);
-    }
 }
